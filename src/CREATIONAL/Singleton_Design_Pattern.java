@@ -72,7 +72,7 @@ class Loger {
             synchronized (  // A synchronized block allows only one thread at a time to execute a critical section of code
                     Loger.class) { // Synchronize only when creating the instance
                 if (instance == null) { // Second check (inside synchronized block)
-                    // why do we do second check because suppose Thread A enter in the critical section and make the instance and when Thread B(that are waiting for thread A to complete) enter in a critical section it see that instance is already created
+                    // why do we do second check because suppose Thread A enter in the critical section and make the instance and when Thread B(that are waiting for thread A to complete) enter in a critical section it see that instance is already created then it will not enter in the critical section
                     instance = new Loger(); // Create the instance if it's still null
                 }
             }
