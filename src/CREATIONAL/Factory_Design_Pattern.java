@@ -75,7 +75,7 @@ public class Factory_Design_Pattern {
      * -------------------------------
      * This class decides which object to create.
      */
-    class NotificationFactory {
+    static class NotificationFactory {
 
         /*
          * This method hides the object creation logic.
