@@ -1,8 +1,31 @@
 package CREATIONAL;
 
+/*
+ * Singleton Design Pattern demonstration
+ *
+ * This file shows two versions of Singleton:
+ *
+ * 1) Logger   -> NOT thread-safe (for learning purpose)
+ * 2) Loger    -> Thread-safe Singleton using
+ *                volatile + double-checked locking
+ *
+ * Main idea:
+ * A Singleton class allows only ONE object to be created
+ * in the whole application.
+ */
+
 public class Singleton_Design_Pattern {
+
     public static void main(String[] args) {
-        // 4. Fetch the single instance of the Logger
+
+        /*
+         * -------------------------------
+         * 1. Normal Singleton (NOT thread-safe)
+         * -------------------------------
+         * Multiple threads try to get the same instance.
+         * This may create more than one object.
+         */
+
         Runnable task = () -> {
             Logger logger = Logger.getInstance();
             logger.log("Hyy");
@@ -16,6 +39,13 @@ public class Singleton_Design_Pattern {
         t2.start();
         t3.start();
 
+        /*
+         * -------------------------------
+         * 2. Thread-safe Singleton
+         * -------------------------------
+         * Uses volatile + synchronized block
+         * to make sure only ONE object is created.
+         */
 
         Runnable multithreadingTask = () -> {
             Loger logger = Loger.getInstance();
@@ -29,55 +59,40 @@ public class Singleton_Design_Pattern {
         t4.start();
         t5.start();
         t6.start();
-
     }
 }
 
+/*
+ * ---------------------------------------
+ * Normal Singleton (NOT thread-safe)
+ * ---------------------------------------
+ *
+ * Only good for single-threaded programs.
+ */
 class Logger {
-    // 1. Private static variable to hold the single instance
+
+    // Holds the single instance
     private static Logger instance;
 
-    // 2. Private constructor to prevent instantiation
+    // Private constructor so no one can create object using new
     private Logger() {
-        System.out.println("Loger constructor called by "
+        System.out.println("Logger constructor called by "
                 + Thread.currentThread().getName());
     }
 
-    // 3. Public method to provide access to the instance
+    /*
+     * Returns the single instance.
+     * In multi-threaded environment this is NOT safe.
+     */
     public static Logger getInstance() {
+
+        // If two threads enter here at the same time,
+        // both can create a new object.
         if (instance == null) {
-            instance = new Logger(); // Create a new instance only if it doesn't exist
+            instance = new Logger();
         }
-        return instance; // Return the existing instance
-    }
-    public void log(String message) {
-        System.out.println("Log: " + message);
-    }
-}
 
-
-// SINGLETON IN MULTITHREADED
-class Loger {
-    private static volatile Loger instance;
-    // volatile ensures that changes made to a variable by one thread are immediately visible to other threads.
-
-    // Private constructor to prevent instantiation
-    private Loger() {
-        System.out.println("Loger constructor called by "
-                + Thread.currentThread().getName());
-    }
-
-    public static Loger getInstance() {
-        if (instance == null) { // First check (no synchronization needed here)
-            synchronized (  // A synchronized block allows only one thread at a time to execute a critical section of code
-                    Loger.class) { // Synchronize only when creating the instance
-                if (instance == null) { // Second check (inside synchronized block)
-                    // why do we do second check because suppose Thread A enter in the critical section and make the instance and when Thread B(that are waiting for thread A to complete) enter in a critical section it see that instance is already created then it will not enter in the critical section
-                    instance = new Loger(); // Create the instance if it's still null
-                }
-            }
-        }
-        return instance; // Return the single instance
+        return instance;
     }
 
     public void log(String message) {
@@ -85,3 +100,69 @@ class Loger {
                 + " -> " + message);
     }
 }
+
+/*
+ * ---------------------------------------
+ * Thread-safe Singleton
+ * ---------------------------------------
+ *
+ * Uses:
+ *  - volatile  -> visibility guarantee
+ *  - synchronized block -> mutual exclusion
+ *
+ * This implementation is called:
+ * "Double-checked locking Singleton"
+ */
+class Loger {
+
+    /*
+     * volatile ensures that when one thread creates the instance,
+     * other threads see the fully created object immediately.
+     */
+    private static volatile Loger instance;
+
+    // Private constructor to stop direct object creation
+    private Loger() {
+        System.out.println("Loger constructor called by "
+                + Thread.currentThread().getName());
+    }
+
+    /*
+     * Returns the single instance in a thread-safe way.
+     */
+    public static Loger getInstance() {
+
+        /*
+         * First check (without locking).
+         * This improves performance after the instance is created.
+         */
+        if (instance == null) {
+
+            /*
+             * Only one thread is allowed inside this block
+             * at a time.
+             */
+            synchronized (Loger.class) {
+
+                /*
+                 * Second check is required because
+                 * another thread may have already created
+                 * the instance while this thread was waiting.
+                 */
+                if (instance == null) {
+
+                    // Create the single instance
+                    instance = new Loger();
+                }
+            }
+        }
+
+        return instance;
+    }
+
+    public void log(String message) {
+        System.out.println(Thread.currentThread().getName()
+                + " -> " + message);
+    }
+}
+
