@@ -15,7 +15,7 @@ package CREATIONAL;
  * Client never creates concrete classes directly.
  */
 
-public class Abstract_Design_Pattern {
+public class AbstractFactory_Design_Pattern {
 
     public static void main(String[] args) {
 
