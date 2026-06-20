@@ -107,7 +107,7 @@ class Logger {
  * ---------------------------------------
  *
  * Uses:
- *  - volatile  -> visibility guarantee
+ *  - volatile  -> visibility guarantee (Whenever one thread changes this variable, all other threads should immediately see the latest value.)
  *  - synchronized block -> mutual exclusion
  *
  * This implementation is called:
